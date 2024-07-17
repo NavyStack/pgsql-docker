@@ -1,0 +1,20 @@
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:16-bookworm
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./logs:/var/log/postgresql
+      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      # - ./pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+      - /home/ubuntu/.acme.sh/heno.kr_ecc/heno.kr.key:/var/lib/postgresql/data/heno.kr.key
+      - /home/ubuntu/.acme.sh/heno.kr_ecc/fullchain.cer:/var/lib/postgresql/data/fullchain.cer
+      - /var/lib/pgsql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - PGDATA=/var/lib/postgresql/data
+      - PGSSLMODE=require
