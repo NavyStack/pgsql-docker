@@ -6,15 +6,32 @@ services:
       - 5432:5432
     volumes:
       - ./data:/var/lib/postgresql/data
-      - ./logs:/var/log/postgresql
-      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
-      # - ./pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
-      - /home/ubuntu/.acme.sh/heno.kr_ecc/heno.kr.key:/var/lib/postgresql/data/heno.kr.key
-      - /home/ubuntu/.acme.sh/heno.kr_ecc/fullchain.cer:/var/lib/postgresql/data/fullchain.cer
-      - /var/lib/pgsql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - PGDATA=/var/lib/postgresql/data
-      - PGSSLMODE=require
+      - TZ=Asia/Seoul
+    shm_size: 2GB
+    mem_limit: 8GB
+    command: |
+        postgres
+          -c log_timezone=Asia/Seoul
+          -c TimeZone=Asia/Seoul
+          -c shared_preload_libraries=pg_stat_statements
+          -c pg_stat_statements.track=all
+          -c max_connections=200
+          -c shared_buffers=2GB
+          -c effective_cache_size=6GB
+          -c maintenance_work_mem=512MB
+          -c checkpoint_completion_target=0.9
+          -c wal_buffers=32MB
+          -c default_statistics_target=100
+          -c random_page_cost=1.1
+          -c effective_io_concurrency=300
+          -c work_mem=16MB
+          -c huge_pages=off
+          -c min_wal_size=128MB
+          -c max_wal_size=4GB
